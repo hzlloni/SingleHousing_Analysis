@@ -202,92 +202,82 @@ def visualize_results(results_df, weights, criteria, district_col):
     - top_n: 상위 몇 개를 표시할지
     """
     # 전체 figure 생성 (2행 2열 레이아웃)
-    fig = plt.figure(figsize=(10, 6))
+    fig = plt.figure(figsize=(12, 8))
     
     # 1. 가중치 바 차트
-    ax1 = plt.subplot(2, 2, 1)  # 2행 2열 중 1번째 위치
-    weight_df = pd.DataFrame({
-        '기준': criteria,
-        '가중치': weights * 100
-    })
-    # 가로 막대 차트 그리기
+    ax1 = plt.subplot(2, 2, 1)
+    weight_df = pd.DataFrame({'기준': criteria, '가중치': weights * 100})
     bars = ax1.barh(weight_df['기준'], weight_df['가중치'], color='steelblue')
-    ax1.set_xlabel('가중치 (%)', fontsize=8)
-    ax1.set_title('엔트로피 가중치 분석 결과', fontsize=8, fontweight='bold')
-    ax1.grid(axis='x', alpha=0.3)   # 세로 격자선 추가
+    ax1.set_xlabel('가중치 (%)', fontsize=9)
+    ax1.set_title('엔트로피 가중치 분석 결과', fontsize=10, fontweight='bold')
+    ax1.grid(axis='x', alpha=0.3)
     
-    # 각 막대 끝에 가중치 값 표시
     for i, bar in enumerate(bars):
         width = bar.get_width()
-        ax1.text(width, bar.get_y() + bar.get_height()/2, 
+        ax1.text(width + 0.2, bar.get_y() + bar.get_height()/2, 
                 f'{width:.2f}%', ha='left', va='center', fontsize=8)
-    
+
     # 2. Top 5 자치구 순위
     ax2 = plt.subplot(2, 2, 2)
     top_districts = results_df.head(5)
-    colors = ['gold', 'silver', 'lightpink', 'lightblue', 'lightgreen'][:5]
+    colors = ['gold', 'silver', 'lightpink', 'lightblue', 'lightgreen']
     bars = ax2.barh(range(5), top_districts['종합점수'].values, color=colors)
     ax2.set_yticks(range(5))
-    ax2.set_yticklabels([f"{i+1}. {name}" for i, name in enumerate(top_districts[district_col].values)])
-    ax2.set_xlabel('종합 점수', fontsize=8)
-    ax2.set_title(f'살기 좋은 자치구 Top {5}', fontsize=8, fontweight='bold')
+    ax2.set_yticklabels([f"{i+1}. {name}" for i, name in enumerate(top_districts[district_col].values)], fontsize=9)
+    ax2.set_xlabel('종합 점수', fontsize=9)
+    ax2.set_title(f'살기 좋은 자치구 Top 5', fontsize=10, fontweight='bold')
     ax2.invert_yaxis()
     ax2.grid(axis='x', alpha=0.3)
     
-    # 점수 값 표시
     for i, bar in enumerate(bars):
         width = bar.get_width()
-        ax2.text(width, bar.get_y() + bar.get_height()/2, 
+        ax2.text(width + 0.5, bar.get_y() + bar.get_height()/2, 
                 f'{width:.2f}', ha='left', va='center', fontsize=8)
-    
-    # 3. 레이더 차트
+
+    # 3. 레이더 차트 (글자 겹침 해결을 위한 패딩 추가)
     ax3 = plt.subplot(2, 2, 3, projection='polar')
-    # 1위 자치구 데이터 추출
     top1 = results_df.iloc[0]
     
-    # 각 기준별 정규화된 값 계산 (0~1 범위)
     normalized_values = []
     for criterion in criteria:
         val = top1[criterion]
         max_val = results_df[criterion].max()
         min_val = results_df[criterion].min()
         range_val = max_val - min_val
-        if range_val == 0:
-            normalized_values.append(0.5)
-        else:
-            normalized_values.append((val - min_val) / range_val)
+        normalized_values.append((val - min_val) / range_val if range_val != 0 else 0.5)
     
-    # 레이더 차트를 위한 각도 계산
     angles = np.linspace(0, 2 * np.pi, len(criteria), endpoint=False).tolist()
-    # 차트를 닫기 위해 첫 값을 마지막에 추가
     normalized_values += normalized_values[:1]
     angles += angles[:1]
     
-    # 레이더 차트 그리기
     ax3.plot(angles, normalized_values, 'o-', linewidth=2, color='darkblue')
     ax3.fill(angles, normalized_values, alpha=0.25, color='skyblue')
     ax3.set_xticks(angles[:-1])
-    ax3.set_xticklabels(criteria, fontsize=8)
-    ax3.set_ylim(0, 1)
-    ax3.set_title(f'1위: {top1[district_col]} 상세 분석', fontsize=8, fontweight='bold', pad=20)
-    ax3.grid(True)
+    # labelpad를 주어 원본 데이터와 글자 사이의 간격 확보
+    ax3.set_xticklabels(criteria, fontsize=9)
+    ax3.tick_params(axis='x', pad=15) 
+    ax3.set_ylim(0, 1.1) # 글자가 그래프 안으로 들어오지 않게 살짝 여유 부여
+    ax3.set_title(f'1위: {top1[district_col]} 상세 분석', fontsize=10, fontweight='bold', pad=30)
     
-    # 4. 전체 순위 점수 분포
+    # 4. 전체 순위 점수 분포 (텍스트 위치 조정)
     ax4 = plt.subplot(2, 2, 4)
     ax4.scatter(range(len(results_df)), results_df['종합점수'].values, 
                c=results_df['순위'].values, cmap='RdYlGn_r', s=100, alpha=0.5)
-    ax4.set_xlabel('순위', fontsize=8)
-    ax4.set_ylabel('종합 점수', fontsize=8)
-    ax4.set_title('전체 자치구 점수 분포', fontsize=8, fontweight='bold')
+    ax4.set_xlabel('순위', fontsize=9)
+    ax4.set_ylabel('종합 점수', fontsize=9)
+    ax4.set_title('전체 자치구 점수 분포', fontsize=10, fontweight='bold')
     ax4.grid(True, alpha=0.3)
     
-    # Top 5 강조
+    # Top 5 텍스트가 서로 겹치지 않도록 번갈아가며 위치 조정
     for i in range(min(5, len(results_df))):
+        y_offset = 12 if i % 2 == 0 else -18 # 위아래로 지그재그 배치
         ax4.annotate(results_df.iloc[i][district_col], 
                     (i, results_df.iloc[i]['종합점수']),
-                    xytext=(5, 5), textcoords='offset points', fontsize=8)
-    
-    plt.tight_layout()
+                    xytext=(0, y_offset), textcoords='offset points', 
+                    ha='center', fontsize=8, fontweight='bold')
+
+    # 자동 레이아웃 설정 (항목 간 간격 확보)
+    plt.tight_layout(pad=3.0) 
     plt.savefig('mcdm_analysis_results.png', dpi=300, bbox_inches='tight')
     plt.show()
 
