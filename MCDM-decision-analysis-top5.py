@@ -44,7 +44,7 @@ def calculate_entropy_weights(data, criteria):
     
     Parameters(입력값) :
     - data: 정규화된 데이터 (numpy array, 0~1 사이 값)
-    - criteria: 평가 기준 리스트 (예: ['월세 평균', '지하철', ...])
+    - criteria: 평가 기준 리스트 (예: ['평당월세 평균', '지하철', ...])
     
     Returns(반환값) :
     - weights: 각 기준의 가중치 (합이 1.0)
@@ -312,7 +312,7 @@ def main():
     
     # 3. 평가 기준 컬럼명 리스트
     criteria = [
-        '월세 평균',
+        '평당 월세 평균',
         '지하철',
         '대규모점포',
         '검거율',
@@ -324,7 +324,7 @@ def main():
     
     # 4. 각 기준이 긍정적(True) 또는 부정적(False)인지 설정
     is_positive = {
-        '월세 평균': False,         # 낮을수록 좋음
+        '평당 월세 평균': False,         # 낮을수록 좋음
         '지하철': True,             # 많을수록 좋음
         '대규모점포': True,         # 많을수록 좋음
         '검거율': True,             # 높을수록 좋음
