@@ -229,13 +229,13 @@ if n_pc >= 2:  #  ✔️ pc1-pc2 산점도
     plt.figure(figsize=(9, 8))
     plt.scatter(scores["PC1"], scores["PC2"], alpha=0.7)
 
-    dx = 0.08 # 오른쪽
-    dy = -0.08  # 아래(4시 방향)  #  ✔️ 글씨가 점과 너무 가까울때 dx/dy ↑ <-> 전체적으로 밀릴때
+    dx = -0.25
+    dy = -0.05  # ✔️ 글씨가 점과 너무 가까울때 dx/dy ↑ <-> 전체적으로 밀릴때
 
     for gu in scores.index: 
         plt.text(
-            scores.loc[gu, "PC1"],
-            scores.loc[gu, "PC2"],
+            scores.loc[gu, "PC1" + dx],
+            scores.loc[gu, "PC2" + dy],
             gu,
             fontsize = 7, #  ✔️글씨 겹침이 심할때 fontsize ↑
             ha = "left",
