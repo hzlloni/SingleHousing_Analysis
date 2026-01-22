@@ -31,7 +31,7 @@ plt.rcParams["axes.unicode_minus"] = False  # 음수 기호 깨짐 방지
 
 
 
-file_path = "서울시 1인가구수.xlsx"
+file_path = "서울시 1인가구수.xlsx" # 파일위치
 df = pd.read_excel(file_path)
 
 data = df.iloc[4:, :]  # 상단 설명 행 제외
@@ -99,7 +99,7 @@ for i in range(n):
 
         ax.scatter(
             i, j,
-            s=abs(value) * 2300,  # ✔️ 2500 -> 2300
+            s=abs(value) * 2300,  # ✔️ 2500 -> 2300 (그래프에 원이 꽉 차서 변경)
             c=value,
             cmap="RdBu_r",
             vmin=-1, vmax=1
@@ -210,7 +210,7 @@ plt.tight_layout()
 plt.show()
 
 
-n_pc = 4  #  ✔️ 보통 2~4 사이에서 결정  # pca 점수 만들기 + 1인가구 붙이기
+n_pc = 4  #  ✔️ 2-4 사이에서 결정  # pca 점수 만들기 + 1인가구 붙이기
 
 scores = pd.DataFrame(
     X_pca[:, :n_pc],
@@ -230,7 +230,7 @@ if n_pc >= 2:  #  ✔️ pc1-pc2 산점도
     plt.scatter(scores["PC1"], scores["PC2"], alpha=0.7)
 
     dx = -0.25
-    dy = -0.05  # ✔️ 글씨가 점과 너무 가까울때 dx/dy ↑ <-> 전체적으로 밀릴때
+    dy = -0.05  # ✔️ 글씨가 점과 너무 가까울때 dx/dy ↑ <-> 전체적으로 밀릴때 → 최대한 겹치지 않게 수정함
 
     for gu in scores.index: 
         plt.text(
