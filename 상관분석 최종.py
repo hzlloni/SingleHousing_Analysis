@@ -31,7 +31,7 @@ plt.rcParams["axes.unicode_minus"] = False  # 음수 기호 깨짐 방지
 
 
 
-file_path = "서울시_1인가구수4.xlsx"
+file_path = "서울시 1인가구수.xlsx"
 df = pd.read_excel(file_path)
 
 data = df.iloc[4:, :]  # 상단 설명 행 제외
